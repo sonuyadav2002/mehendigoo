@@ -1,15 +1,16 @@
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Colors from "../constants/Colors";
 
-import BookingRequestsScreen from "@/screens/Artist/BookingRequestsScreen";
-import MyBookingsScreen from "@/screens/Customer/MyBookingsScreen";
 import DashboardScreen from "../screens/Artist/DashboardScreen";
 import LeadsScreen from "../screens/Artist/LeadsScreen";
 import ArtistProfileScreen from "../screens/Artist/ProfileScreen";
 import ArtistWalletScreen from "../screens/Artist/WalletScreen";
+import BookingRequestsScreen from "../screens/Artist/BookingRequestsScreen";
 import ProfileScreen from "../screens/Common/ProfileScreen";
 import WalletScreen from "../screens/Common/WalletScreen";
 import HomeScreen from "../screens/Customer/HomeScreen";
+import MyBookingsScreen from "../screens/Customer/MyBookingsScreen";
 import WishlistScreen from "../screens/Customer/WishlistScreen";
 
 const Tab = createBottomTabNavigator();
@@ -90,8 +91,8 @@ export default function BottomTab({ route }) {
       screenOptions={{
         headerShown: false,
 
-        tabBarActiveTintColor: "#F7146B",
-        tabBarInactiveTintColor: "#6B7280",
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.textTertiary,
 
         tabBarStyle: {
           position: "absolute",
@@ -99,14 +100,11 @@ export default function BottomTab({ route }) {
           right: 16,
           bottom: 12,
           height: 68,
-
           borderRadius: 20,
-          backgroundColor: "#FFFFFF",
-
+          backgroundColor: Colors.white,
           borderTopWidth: 0,
-
           elevation: 12,
-          shadowColor: "#000",
+          shadowColor: Colors.text,
           shadowOffset: {
             width: 0,
             height: 4,

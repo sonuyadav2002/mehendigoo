@@ -7,20 +7,19 @@ import {
   Text,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Colors from "../../constants/Colors";
 
-export default function Onboarding1({ navigation }) {
+export default function Onboarding2({ navigation }) {
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
 
-      {/* Header */}
       <View style={styles.header}>
-        <Ionicons name="chevron-back" size={24} color="#333" />
-
-        <Ionicons name="ellipsis-horizontal" size={20} color="#333" />
+        <Ionicons name="chevron-back" size={24} color={Colors.text} />
+        <Ionicons name="ellipsis-horizontal" size={20} color={Colors.text} />
       </View>
 
-      {/* Main Image */}
       <View style={styles.imageCard}>
         <Image
           source={require("../../assets/images/Henna.jpg")}
@@ -29,79 +28,67 @@ export default function Onboarding1({ navigation }) {
         />
       </View>
 
-      {/* Title */}
       <Text style={styles.title}>Book with Confidence</Text>
-
-      {/* Subtitle */}
       <Text style={styles.subtitle}>Browse ratings, reviews and secure</Text>
-
       <Text style={styles.subtitle}>booking details for every artist.</Text>
 
-      {/* Button */}
       <Pressable
         style={styles.button}
         onPress={() => navigation.navigate("Onboarding3")}
       >
         <Text style={styles.buttonText}>Next</Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Colors.white,
     paddingHorizontal: 24,
-    paddingTop: 55,
   },
-
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingTop: 8,
   },
-
   imageCard: {
     width: "100%",
     height: 320,
-    backgroundColor: "#F7F7F7",
+    backgroundColor: Colors.background,
     borderRadius: 30,
     marginTop: 30,
     overflow: "hidden",
   },
-
   image: {
     width: "100%",
     height: "100%",
   },
-
   title: {
     marginTop: 35,
     textAlign: "center",
     fontSize: 28,
     fontWeight: "700",
-    color: "#111",
+    color: Colors.text,
   },
-
   subtitle: {
     textAlign: "center",
-    color: "#8A8A8A",
+    color: Colors.textSecondary,
     fontSize: 15,
     marginTop: 8,
   },
-
   button: {
     height: 54,
-    backgroundColor: "#F7146B",
+    backgroundColor: Colors.primary,
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 60,
   },
-
   buttonText: {
-    color: "#FFFFFF",
+    color: Colors.white,
     fontSize: 16,
     fontWeight: "700",
   },

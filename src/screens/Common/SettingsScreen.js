@@ -1,25 +1,53 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Colors from "../../constants/Colors";
 
-export default function SettingsScreen() {
+export default function SettingsScreen({ navigation }) {
+  const settingsOptions = [
+    { icon: "notifications-outline", label: "Notifications", route: "NotificationCenter", color: Colors.warning },
+    { icon: "lock-closed-outline", label: "Change Password", route: "ChangePassword", color: Colors.info },
+    { icon: "shield-checkmark-outline", label: "Privacy Policy", route: "PrivacyPolicy", color: Colors.success },
+    { icon: "document-text-outline", label: "Terms & Conditions", route: "TermsConditions", color: Colors.primary },
+    { icon: "help-circle-outline", label: "Help & Support", route: "Support", color: Colors.textSecondary },
+    { icon: "trash-outline", label: "Delete Account", route: "DeleteAccount", color: Colors.error },
+  ];
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={22} color={Colors.text} />
+        </TouchableOpacity>
         <Text style={styles.title}>Settings</Text>
+        <View style={{ width: 40 }} />
       </View>
+
       <View style={styles.content}>
-        <Text style={styles.item}>Notifications</Text>
-        <Text style={styles.item}>Privacy</Text>
-        <Text style={styles.item}>Account</Text>
-        <Text style={styles.item}>Help & Support</Text>
+        {settingsOptions.map((item, index) => (
+          <TouchableOpacity key={index} style={styles.menuItem} onPress={() => navigation.navigate(item.route)}>
+            <View style={styles.menuLeft}>
+              <View style={[styles.menuIcon, { backgroundColor: item.color + "20" }]}>
+                <Ionicons name={item.icon} size={20} color={item.color} />
+              </View>
+              <Text style={styles.menuLabel}>{item.label}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={Colors.textTertiary} />
+          </TouchableOpacity>
+        ))}
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFF8FA" },
-  header: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: "700", color: "#222" },
-  content: { paddingHorizontal: 20, marginTop: 12 },
-  item: { paddingVertical: 14, fontSize: 16, color: "#222" },
+  container: { flex: 1, backgroundColor: Colors.primaryLight + "20" },
+  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingVertical: 14 },
+  backBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: Colors.white, justifyContent: "center", alignItems: "center" },
+  title: { fontSize: 22, fontWeight: "700", color: Colors.text },
+  content: { paddingHorizontal: 16, marginTop: 10 },
+  menuItem: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: Colors.white, padding: 16, borderRadius: 14, marginBottom: 10 },
+  menuLeft: { flexDirection: "row", alignItems: "center" },
+  menuIcon: { width: 42, height: 42, borderRadius: 12, justifyContent: "center", alignItems: "center", marginRight: 14 },
+  menuLabel: { fontSize: 15, fontWeight: "500", color: Colors.text },
 });

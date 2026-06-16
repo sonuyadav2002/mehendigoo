@@ -1,7 +1,3 @@
-import BookingDetailsScreen from "@/screens/Artist/BookingDetailsScreen";
-import EditProfileScreen from "@/screens/Artist/EditProfileScreen";
-import LeadDetailsScreen from "@/screens/Artist/LeadDetailsScreen";
-import PortfolioScreen from "@/screens/Customer/PortfolioScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useArtistOnboarding } from "../context/ArtistOnboardingContext";
 import AadhaarVerificationScreen from "../screens/Artist/AadhaarVerificationScreen";
@@ -13,6 +9,10 @@ import PersonalDetailsScreen from "../screens/Artist/PersonalDetailsScreen";
 import ProfilePhotoScreen from "../screens/Artist/ProfilePhotoScreen";
 import ReviewSubmitScreen from "../screens/Artist/ReviewSubmitScreen";
 import WorkSamplesScreen from "../screens/Artist/WorkSamplesScreen";
+import LeadDetailsScreen from "../screens/Artist/LeadDetailsScreen";
+import BookingDetailsScreen from "../screens/Artist/BookingDetailsScreen";
+import PortfolioScreen from "../screens/Customer/PortfolioScreen";
+import EditProfileScreen from "../screens/Artist/EditProfileScreen";
 
 const Stack = createNativeStackNavigator();
 

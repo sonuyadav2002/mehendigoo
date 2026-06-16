@@ -8,6 +8,7 @@ export default function CustomInput({
   placeholder,
   secureTextEntry,
   style,
+  multiline,
 }) {
   return (
     <View style={styles.container}>
@@ -18,6 +19,7 @@ export default function CustomInput({
         placeholder={placeholder}
         secureTextEntry={secureTextEntry}
         placeholderTextColor={Colors.placeholder}
+        multiline={multiline}
         style={[styles.input, style]}
       />
     </View>

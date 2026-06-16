@@ -1,7 +1,9 @@
 const Fonts = {
-  regular: "System",
-  medium: "System",
-  bold: "System",
+  regular: "Poppins",
+  medium: "Poppins",
+  bold: "Poppins",
+  light: "Poppins",
+  semibold: "Poppins",
 };
 
 export default Fonts;

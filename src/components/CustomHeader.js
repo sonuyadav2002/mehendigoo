@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 
 export default function CustomHeader({ title, subtitle, onBack }) {
@@ -6,7 +7,7 @@ export default function CustomHeader({ title, subtitle, onBack }) {
     <View style={styles.container}>
       {onBack ? (
         <Pressable onPress={onBack} style={styles.backButton}>
-          <Text style={styles.backText}>{"< Back"}</Text>
+          <Ionicons name="chevron-back" size={24} color={Colors.text} />
         </Pressable>
       ) : null}
       <View style={styles.textContainer}>
@@ -26,12 +27,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   backButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  backText: {
-    color: Colors.primary,
-    fontSize: 16,
+    padding: 4,
   },
   textContainer: {
     flex: 1,

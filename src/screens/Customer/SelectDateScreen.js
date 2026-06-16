@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Calendar } from "react-native-calendars";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import Colors from "../../constants/Colors";
+import CustomButton from "../../components/CustomButton";
 
 export default function SelectDateScreen({ navigation }) {
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Select Date</Text>
 
       <View style={styles.calendarCard}>
@@ -19,84 +20,38 @@ export default function SelectDateScreen({ navigation }) {
           hideExtraDays
           enableSwipeMonths
           renderArrow={(direction) => (
-            <Ionicons
-              name={direction === "left" ? "chevron-back" : "chevron-forward"}
-              size={20}
-              color="#222"
-            />
+            <Ionicons name={direction === "left" ? "chevron-back" : "chevron-forward"} size={20} color={Colors.text} />
           )}
           markedDates={{
-            [selectedDate]: {
-              selected: true,
-              selectedColor: "#F7146B",
-            },
+            [selectedDate]: { selected: true, selectedColor: Colors.primary },
           }}
           theme={{
-            backgroundColor: "#fff",
-            calendarBackground: "#fff",
-            textSectionTitleColor: "#999",
-            monthTextColor: "#222",
+            backgroundColor: Colors.white,
+            calendarBackground: Colors.white,
+            textSectionTitleColor: Colors.textTertiary,
+            monthTextColor: Colors.text,
             textMonthFontSize: 16,
             textMonthFontWeight: "700",
-            dayTextColor: "#222",
+            dayTextColor: Colors.text,
             textDayFontSize: 14,
-            selectedDayBackgroundColor: "#F7146B",
-            selectedDayTextColor: "#fff",
-            todayTextColor: "#F7146B",
-            arrowColor: "#222",
+            selectedDayBackgroundColor: Colors.primary,
+            selectedDayTextColor: Colors.white,
+            todayTextColor: Colors.primary,
+            arrowColor: Colors.text,
           }}
         />
       </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          navigation.navigate("SelectTimeSlot");
-        }}
-      >
-        <Text style={styles.buttonText}>Continue</Text>
-      </TouchableOpacity>
-    </View>
+      <View style={styles.footer}>
+        <CustomButton title="Continue" onPress={() => navigation.navigate("SelectTimeSlot")} />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 20,
-    paddingTop: 50,
-  },
-
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-
-  calendarCard: {
-    backgroundColor: "#FFF",
-    // borderRadius: 20,
-    // padding: 8,
-  },
-
-  button: {
-    position: "absolute",
-    bottom: 25,
-    left: 20,
-    right: 20,
-    height: 54,
-    backgroundColor: "#F7146B",
-    borderRadius: 14,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "700",
-  },
+  container: { flex: 1, backgroundColor: Colors.white, paddingHorizontal: 20, paddingTop: 20 },
+  title: { fontSize: 22, fontWeight: "700", color: Colors.text, marginBottom: 20, textAlign: "center" },
+  calendarCard: { backgroundColor: Colors.white },
+  footer: { paddingHorizontal: 20, paddingBottom: 25, paddingTop: 10 },
 });

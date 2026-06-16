@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Colors from "../../constants/Colors";
 import { useArtistOnboarding } from "../../context/ArtistOnboardingContext";
 
 export default function RoleSelectionScreen({ navigation }) {
@@ -43,12 +45,10 @@ export default function RoleSelectionScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Choose Your Role</Text>
-
       <Text style={styles.subtitle}>Select an option to continue</Text>
 
-      {/* Customer Card */}
       <TouchableOpacity
         activeOpacity={0.8}
         style={[
@@ -59,7 +59,6 @@ export default function RoleSelectionScreen({ navigation }) {
       >
         <View>
           <Text style={styles.roleTitle}>I am a Customer</Text>
-
           <Text style={styles.roleSubtitle}>Book Services</Text>
         </View>
 
@@ -73,7 +72,6 @@ export default function RoleSelectionScreen({ navigation }) {
         </View>
       </TouchableOpacity>
 
-      {/* Artist Card */}
       <TouchableOpacity
         activeOpacity={0.8}
         style={[
@@ -84,7 +82,6 @@ export default function RoleSelectionScreen({ navigation }) {
       >
         <View>
           <Text style={styles.roleTitle}>I am an Artist</Text>
-
           <Text style={styles.roleSubtitle}>Offer Services</Text>
         </View>
 
@@ -101,35 +98,32 @@ export default function RoleSelectionScreen({ navigation }) {
       <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
         <Text style={styles.continueText}>Continue</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Colors.white,
     paddingHorizontal: 24,
     justifyContent: "center",
   },
-
   title: {
     fontSize: 30,
     fontWeight: "700",
-    color: "#111",
+    color: Colors.text,
   },
-
   subtitle: {
     fontSize: 14,
-    color: "#8A8A8A",
+    color: Colors.textSecondary,
     marginTop: 6,
     marginBottom: 40,
   },
-
   roleCard: {
     height: 95,
     borderWidth: 1,
-    borderColor: "#E8E8E8",
+    borderColor: Colors.border,
     borderRadius: 16,
     paddingHorizontal: 18,
     flexDirection: "row",
@@ -137,56 +131,48 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 18,
   },
-
   selectedCard: {
-    borderColor: "#F7146B",
+    borderColor: Colors.primary,
     borderWidth: 2,
   },
-
   roleTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#111",
+    color: Colors.text,
   },
-
   roleSubtitle: {
     marginTop: 5,
     fontSize: 14,
-    color: "#999",
+    color: Colors.textTertiary,
   },
-
   radioCircle: {
     width: 28,
     height: 28,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: "#CFCFCF",
+    borderColor: Colors.border,
     justifyContent: "center",
     alignItems: "center",
   },
-
   activeCircle: {
-    backgroundColor: "#F7146B",
-    borderColor: "#F7146B",
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
-
   check: {
-    color: "#FFFFFF",
+    color: Colors.white,
     fontWeight: "700",
     fontSize: 14,
   },
-
   continueButton: {
     height: 55,
-    backgroundColor: "#F7146B",
+    backgroundColor: Colors.primary,
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 50,
   },
-
   continueText: {
-    color: "#FFFFFF",
+    color: Colors.white,
     fontSize: 16,
     fontWeight: "700",
   },

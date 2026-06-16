@@ -1,23 +1,37 @@
-import SupportScreen from "@/screens/Common/SupportScreen";
-import AddressSelection from "@/screens/Customer/AddressSelection";
-import ArtistListingScreen from "@/screens/Customer/ArtistListingScreen";
-import BookingDetailsScreen from "@/screens/Customer/BookingDetailsScreen";
-import BookingSuccessScreen from "@/screens/Customer/BookingSuccessScreen";
-import CategoriesScreen from "@/screens/Customer/CategoriesScreen";
-import CouponsScreen from "@/screens/Customer/CouponsScreen";
-import LiveTrackingScreen from "@/screens/Customer/LiveTrackingScreen";
-import MyBookingsScreen from "@/screens/Customer/MyBookingsScreen";
-import SearchScreen from "@/screens/Customer/SearchScreen";
-import SelectDateScreen from "@/screens/Customer/SelectDateScreen";
-import SelectService from "@/screens/Customer/SelectService";
-import SelectTimeSlotScreen from "@/screens/Customer/SelectTimeSlotScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+import ChangePasswordScreen from "../screens/Common/ChangePasswordScreen";
+import DeleteAccountScreen from "../screens/Common/DeleteAccountScreen";
 import EditProfileScreen from "../screens/Common/EditProfileScreen";
+import NotificationCenterScreen from "../screens/Common/NotificationCenterScreen";
+import PrivacyPolicyScreen from "../screens/Common/PrivacyPolicyScreen";
 import SettingsScreen from "../screens/Common/SettingsScreen";
+import SupportScreen from "../screens/Common/SupportScreen";
+import TermsConditionsScreen from "../screens/Common/TermsConditionsScreen";
+
+import AddressSelection from "../screens/Customer/AddressSelection";
+import ArtistListingScreen from "../screens/Customer/ArtistListingScreen";
 import ArtistProfileScreen from "../screens/Customer/ArtistProfileScreen";
+import BookingCancellationScreen from "../screens/Customer/BookingCancellationScreen";
+import BookingDetailsScreen from "../screens/Customer/BookingDetailsScreen";
+import BookingSuccessScreen from "../screens/Customer/BookingSuccessScreen";
 import BookingSummaryScreen from "../screens/Customer/BookingSummaryScreen";
+import CategoriesScreen from "../screens/Customer/CategoriesScreen";
+import ContactSupportScreen from "../screens/Customer/ContactSupportScreen";
+import CouponsScreen from "../screens/Customer/CouponsScreen";
+import LiveTrackingScreen from "../screens/Customer/LiveTrackingScreen";
+import MyBookingsScreen from "../screens/Customer/MyBookingsScreen";
+import NotificationDetailsScreen from "../screens/Customer/NotificationDetailsScreen";
+import PaymentFailedScreen from "../screens/Customer/PaymentFailedScreen";
 import PaymentScreen from "../screens/Customer/PaymentScreen";
 import PortfolioScreen from "../screens/Customer/PortfolioScreen";
+import RefundStatusScreen from "../screens/Customer/RefundStatusScreen";
+import ReviewSubmissionScreen from "../screens/Customer/ReviewSubmissionScreen";
+import SearchScreen from "../screens/Customer/SearchScreen";
+import SelectDateScreen from "../screens/Customer/SelectDateScreen";
+import SelectService from "../screens/Customer/SelectService";
+import SelectTimeSlotScreen from "../screens/Customer/SelectTimeSlotScreen";
+
 import BottomTab from "./BottomTab";
 
 const Stack = createNativeStackNavigator();
@@ -25,11 +39,7 @@ const Stack = createNativeStackNavigator();
 export default function CustomerStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen
-        name="CustomerTabs"
-        component={BottomTab}
-        initialParams={{ role: "customer" }}
-      />
+      <Stack.Screen name="CustomerTabs" component={BottomTab} initialParams={{ role: "customer" }} />
       <Stack.Screen name="ArtistProfile" component={ArtistProfileScreen} />
       <Stack.Screen name="Search" component={SearchScreen} />
       <Stack.Screen name="Categories" component={CategoriesScreen} />
@@ -49,6 +59,17 @@ export default function CustomerStack() {
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
       <Stack.Screen name="BookingDetails" component={BookingDetailsScreen} />
+      <Stack.Screen name="NotificationCenter" component={NotificationCenterScreen} />
+      <Stack.Screen name="NotificationDetails" component={NotificationDetailsScreen} />
+      <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+      <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+      <Stack.Screen name="TermsConditions" component={TermsConditionsScreen} />
+      <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} />
+      <Stack.Screen name="BookingCancellation" component={BookingCancellationScreen} />
+      <Stack.Screen name="ContactSupport" component={ContactSupportScreen} />
+      <Stack.Screen name="ReviewSubmission" component={ReviewSubmissionScreen} />
+      <Stack.Screen name="RefundStatus" component={RefundStatusScreen} />
+      <Stack.Screen name="PaymentFailed" component={PaymentFailedScreen} />
     </Stack.Navigator>
   );
 }

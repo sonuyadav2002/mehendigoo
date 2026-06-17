@@ -1,12 +1,62 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "../../constants/Colors";
-import CustomButton from "../../components/CustomButton";
 import { useArtistOnboarding } from "../../context/ArtistOnboardingContext";
+import { createArtistProfile } from "../../services/artist";
+import { secureStorage } from "../../utils/storage";
 
 export default function ReviewSubmitScreen({ navigation }) {
-  const { artistDetails, submitArtistProfile } = useArtistOnboarding();
+  const {
+    artistDetails,
+    aadhaarFiles,
+    profilePhoto,
+    submitArtistProfile,
+  } = useArtistOnboarding();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      const userData = await secureStorage.getUserData();
+      const payload = {
+        user_id: userData?.id || userData?.user_id || "",
+        bio: artistDetails.bio,
+        experience_years: Number(artistDetails.experienceYears),
+        price_start: Number(artistDetails.priceStart),
+        home_service: artistDetails.homeService,
+        salon_service: artistDetails.salonService,
+        latitude: "26.912434",
+        longitude: "75.787271",
+        aadhaar_front: aadhaarFiles?.front || null,
+        aadhaar_back: aadhaarFiles?.back || null,
+        selfie_image: profilePhoto || null,
+      };
+
+      console.log("Creating artist profile with payload:", JSON.stringify(payload, null, 2));
+      const result = await createArtistProfile(payload);
+      console.log("Artist profile created:", JSON.stringify(result, null, 2));
+
+      await secureStorage.setArtistOnboardingDone(true);
+      submitArtistProfile();
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "ArtistStack" }],
+      });
+    } catch (err) {
+      const message =
+        err?.response?.data?.message ||
+        err.message ||
+        "Failed to create profile. Please try again.";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -19,9 +69,24 @@ export default function ReviewSubmitScreen({ navigation }) {
             <Ionicons name="person-circle-outline" size={22} color={Colors.primary} />
             <Text style={styles.cardTitle}>Personal Details</Text>
           </View>
-          <Text style={styles.info}>{artistDetails?.fullName || "Artist Name"}</Text>
-          <Text style={styles.infoLight}>{artistDetails?.email || "artist@email.com"}</Text>
-          <Text style={styles.infoLight}>{artistDetails?.city || "City"}</Text>
+          <Text style={styles.info}>{artistDetails?.fullName || "N/A"}</Text>
+          <Text style={styles.infoLight}>{artistDetails?.email || "N/A"}</Text>
+          <Text style={styles.infoLight}>{artistDetails?.phone || "N/A"}</Text>
+          <Text style={styles.infoLight}>{artistDetails?.gender || "N/A"}</Text>
+          <Text style={styles.infoLight}>{artistDetails?.city || ""}{artistDetails?.city && artistDetails?.state ? ", " : ""}{artistDetails?.state || ""}</Text>
+        </View>
+
+        <View style={styles.card}>
+          <View style={styles.row}>
+            <Ionicons name="briefcase-outline" size={22} color={Colors.primary} />
+            <Text style={styles.cardTitle}>Professional Info</Text>
+          </View>
+          <Text style={styles.infoLight}>Bio: {artistDetails?.bio || "N/A"}</Text>
+          <Text style={styles.infoLight}>Experience: {artistDetails?.experienceYears || "0"} years</Text>
+          <Text style={styles.infoLight}>Starting Price: ₹{artistDetails?.priceStart || "0"}</Text>
+          <Text style={styles.infoLight}>
+            Services: {artistDetails?.homeService ? "Home" : ""}{artistDetails?.homeService && artistDetails?.salonService ? " + " : ""}{artistDetails?.salonService ? "Salon" : ""}
+          </Text>
         </View>
 
         <View style={styles.card}>
@@ -30,22 +95,21 @@ export default function ReviewSubmitScreen({ navigation }) {
             <Text style={styles.cardTitle}>Documents</Text>
           </View>
           <View style={styles.statusRow}>
-            <Text style={styles.statusText}>Aadhaar Verified</Text>
-            <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
+            <Text style={styles.statusText}>Aadhaar Front</Text>
+            <Ionicons name={aadhaarFiles?.front ? "checkmark-circle" : "ellipse-outline"} size={20} color={aadhaarFiles?.front ? Colors.success : Colors.textTertiary} />
           </View>
           <View style={styles.statusRow}>
-            <Text style={styles.statusText}>PAN Verified</Text>
-            <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
-          </View>
-          <View style={styles.statusRow}>
-            <Text style={styles.statusText}>Profile Photo Added</Text>
-            <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
-          </View>
-          <View style={styles.statusRow}>
-            <Text style={styles.statusText}>Work Samples Added</Text>
-            <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
+            <Text style={styles.statusText}>Aadhaar Back</Text>
+            <Ionicons name={aadhaarFiles?.back ? "checkmark-circle" : "ellipse-outline"} size={20} color={aadhaarFiles?.back ? Colors.success : Colors.textTertiary} />
           </View>
         </View>
+
+        {error ? (
+          <View style={styles.errorCard}>
+            <Ionicons name="alert-circle" size={20} color={Colors.error} />
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : null}
 
         <View style={styles.noteCard}>
           <Ionicons name="information-circle" size={22} color={Colors.primary} />
@@ -54,7 +118,17 @@ export default function ReviewSubmitScreen({ navigation }) {
       </ScrollView>
 
       <View style={styles.footer}>
-        <CustomButton title="Submit Application" onPress={() => { submitArtistProfile(); navigation.navigate("ApprovalPending"); }} />
+        <TouchableOpacity
+          style={[styles.submitBtn, loading && styles.disabledBtn]}
+          onPress={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color={Colors.white} size="small" />
+          ) : (
+            <Text style={styles.submitBtnText}>Submit Application</Text>
+          )}
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -72,7 +146,12 @@ const styles = StyleSheet.create({
   infoLight: { fontSize: 13, color: Colors.textSecondary, marginBottom: 4 },
   statusRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 12 },
   statusText: { fontSize: 14, color: Colors.text },
+  errorCard: { flexDirection: "row", backgroundColor: Colors.error + "15", borderRadius: 12, padding: 14, marginBottom: 15, alignItems: "center", gap: 10 },
+  errorText: { flex: 1, color: Colors.error, fontSize: 13 },
   noteCard: { flexDirection: "row", backgroundColor: Colors.primaryLight + "40", borderRadius: 14, padding: 15, alignItems: "flex-start" },
   noteText: { flex: 1, marginLeft: 10, color: Colors.textSecondary, fontSize: 13, lineHeight: 20 },
   footer: { position: "absolute", bottom: 0, left: 0, right: 0, backgroundColor: Colors.white, padding: 20 },
+  submitBtn: { height: 56, borderRadius: 16, backgroundColor: Colors.primary, justifyContent: "center", alignItems: "center" },
+  disabledBtn: { opacity: 0.7 },
+  submitBtnText: { color: Colors.white, fontSize: 16, fontWeight: "700" },
 });

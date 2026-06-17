@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -19,8 +18,15 @@ export default function RegisterScreen({ navigation }) {
   const [mobile, setMobile] = useState("");
   const [role, setRole] = useState("USER");
   const [loading, setLoading] = useState(false);
+  const [nameError, setNameError] = useState("");
+  const [mobileError, setMobileError] = useState("");
+  const [apiError, setApiError] = useState("");
 
   const handleRegister = async () => {
+    setNameError("");
+    setMobileError("");
+    setApiError("");
+
     const trimmedName = name.trim();
     let trimmedPhone = mobile.trim();
     if (trimmedPhone && !trimmedPhone.startsWith("+")) {
@@ -28,12 +34,12 @@ export default function RegisterScreen({ navigation }) {
     }
 
     if (!trimmedName) {
-      Alert.alert("Validation Error", "Please enter your name");
+      setNameError("Please enter your name");
       return;
     }
 
     if (!trimmedPhone || trimmedPhone.length < 10) {
-      Alert.alert("Validation Error", "Please enter a valid mobile number");
+      setMobileError("Please enter a valid mobile number");
       return;
     }
 
@@ -52,9 +58,7 @@ export default function RegisterScreen({ navigation }) {
         error?.response?.data?.message ||
         error.message ||
         "Failed to send OTP. Please try again.";
-      console.log(message, "Sssssss");
-
-      Alert.alert("Error", message);
+      setApiError(message);
     } finally {
       setLoading(false);
     }
@@ -69,20 +73,27 @@ export default function RegisterScreen({ navigation }) {
         <Text style={styles.title}>Create Account</Text>
         <Text style={styles.subtitle}>Register to continue</Text>
 
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer, nameError ? styles.inputError : null]}>
           <TextInput
             value={name}
-            onChangeText={setName}
+            onChangeText={(text) => {
+              setName(text);
+              setNameError("");
+            }}
             style={styles.input}
             placeholder="Full Name"
             placeholderTextColor={Colors.placeholder}
           />
         </View>
+        {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
 
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer, mobileError ? styles.inputError : null]}>
           <TextInput
             value={mobile}
-            onChangeText={setMobile}
+            onChangeText={(text) => {
+              setMobile(text);
+              setMobileError("");
+            }}
             style={styles.input}
             placeholder="Mobile Number"
             placeholderTextColor={Colors.placeholder}
@@ -90,6 +101,9 @@ export default function RegisterScreen({ navigation }) {
             maxLength={15}
           />
         </View>
+        {mobileError ? <Text style={styles.errorText}>{mobileError}</Text> : null}
+
+        {apiError ? <Text style={styles.errorText}>{apiError}</Text> : null}
 
         <Text style={styles.roleLabel}>I want to</Text>
         <View style={styles.roleRow}>
@@ -114,7 +128,6 @@ export default function RegisterScreen({ navigation }) {
             >
               Customer
             </Text>
-            {/* <Text style={styles.roleSubText}>Book Mehendi Artists</Text> */}
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -138,7 +151,6 @@ export default function RegisterScreen({ navigation }) {
             >
               Mehendi Artist
             </Text>
-            {/* <Text style={styles.roleSubText}>Offer Mehendi Services</Text> */}
           </TouchableOpacity>
         </View>
 
@@ -185,10 +197,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 15,
-    marginBottom: 16,
+    marginBottom: 4,
     backgroundColor: Colors.inputBackground,
   },
+  inputError: {
+    borderColor: Colors.error || "#FF3B30",
+  },
   input: { flex: 1, fontSize: 15, color: Colors.text },
+  errorText: {
+    color: Colors.error || "#FF3B30",
+    fontSize: 12,
+    marginBottom: 12,
+    marginLeft: 4,
+  },
   roleLabel: {
     fontSize: 15,
     fontWeight: "600",

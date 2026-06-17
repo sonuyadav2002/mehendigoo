@@ -11,6 +11,13 @@ export function ArtistOnboardingProvider({ children }) {
     mobile: "",
     city: "",
     state: "",
+    bio: "",
+    priceStart: "",
+    experienceYears: "",
+    homeService: true,
+    salonService: false,
+    gender: "",
+    phone: "",
   });
   const [aadhaarFiles, setAadhaarFiles] = useState({
     front: null,

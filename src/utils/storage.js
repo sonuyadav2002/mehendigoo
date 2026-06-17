@@ -90,6 +90,16 @@ export const secureStorage = {
     return value ? JSON.parse(value) : false;
   },
 
+  // Artist Onboarding
+  setArtistOnboardingDone: async (value) => {
+    await AsyncStorage.setItem("artist_onboarding_done", JSON.stringify(value));
+  },
+
+  getArtistOnboardingDone: async () => {
+    const value = await AsyncStorage.getItem("artist_onboarding_done");
+    return value ? JSON.parse(value) : false;
+  },
+
   // Clear All
   clearAll: async () => {
     await AsyncStorage.multiRemove(Object.values(TOKEN_KEYS));

@@ -34,7 +34,7 @@ export default function Onboarding1({ navigation }) {
 
       <Pressable
         style={styles.button}
-        onPress={() => navigation.navigate("Onboarding2")}
+        onPress={() => navigation.replace("Login")}
       >
         <Text style={styles.buttonText}>Next</Text>
       </Pressable>

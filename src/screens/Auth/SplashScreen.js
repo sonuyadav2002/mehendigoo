@@ -2,11 +2,28 @@ import { useEffect } from "react";
 import { Image, StatusBar, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "../../constants/Colors";
+import { secureStorage } from "../../utils/storage";
 
 export default function SplashScreen({ navigation }) {
   useEffect(() => {
-    const timer = setTimeout(() => navigation.replace("Onboarding1"), 1000);
-    return () => clearTimeout(timer);
+    const init = async () => {
+      const token = await secureStorage.getAccessToken();
+      const role = await secureStorage.getUserRole();
+
+      if (token && role === "ARTIST") {
+        navigation.replace("ArtistStack");
+        return;
+      }
+
+      if (token && role === "USER") {
+        navigation.replace("CustomerStack");
+        return;
+      }
+
+      setTimeout(() => navigation.replace("Onboarding1"), 500);
+    };
+
+    init();
   }, [navigation]);
 
   return (

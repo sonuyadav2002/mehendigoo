@@ -1,17 +1,8 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Colors from "../../constants/Colors";
-import { useArtistOnboarding } from "../../context/ArtistOnboardingContext";
 
 export default function ApprovalPendingScreen({ navigation }) {
-  const { artistApproved } = useArtistOnboarding();
-
-  const handleDashboard = () => {
-    if (artistApproved) {
-      navigation.reset({ index: 0, routes: [{ name: "ArtistStack" }] });
-    }
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -42,10 +33,12 @@ export default function ApprovalPendingScreen({ navigation }) {
       </View>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.button} onPress={handleDashboard}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.reset({ index: 0, routes: [{ name: "ArtistStack" }] })}
+        >
           <Text style={styles.buttonText}>Go to Dashboard</Text>
         </TouchableOpacity>
-        {!artistApproved && <Text style={styles.pendingText}>Dashboard will unlock once approved.</Text>}
       </View>
     </SafeAreaView>
   );
@@ -67,5 +60,4 @@ const styles = StyleSheet.create({
   footer: { paddingHorizontal: 20, paddingBottom: 25 },
   button: { height: 52, backgroundColor: Colors.primary, borderRadius: 10, justifyContent: "center", alignItems: "center" },
   buttonText: { color: Colors.white, fontSize: 15, fontWeight: "600" },
-  pendingText: { marginTop: 12, textAlign: "center", color: Colors.textTertiary, fontSize: 13 },
 });

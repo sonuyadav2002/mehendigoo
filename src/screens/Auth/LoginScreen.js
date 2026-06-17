@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -10,10 +11,49 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "../../constants/Colors";
+import { sendOtp } from "../../services/auth";
 
 export default function LoginScreen({ navigation }) {
   const [mobile, setMobile] = useState("");
-  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("USER");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLogin = async () => {
+    setError("");
+    let phone = mobile.trim();
+    if (!phone) {
+      setError("Please enter your mobile number");
+      return;
+    }
+    if (phone.length < 10) {
+      setError("Please enter a valid mobile number");
+      return;
+    }
+    if (!phone.startsWith("+")) {
+      phone = `+91${phone}`;
+    }
+
+    setLoading(true);
+    try {
+      const otpRes = await sendOtp("", phone, role);
+      const otp = otpRes?.data?.otp ? String(otpRes.data.otp) : "";
+      navigation.navigate("Otp", {
+        phone,
+        name: "",
+        role,
+        otp,
+      });
+    } catch (error) {
+      const message =
+        error?.response?.data?.message ||
+        error.message ||
+        "Failed to send OTP. Please try again.";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -27,30 +67,78 @@ export default function LoginScreen({ navigation }) {
         <View style={styles.inputContainer}>
           <TextInput
             value={mobile}
-            onChangeText={setMobile}
+            onChangeText={(text) => {
+              setMobile(text);
+              setError("");
+            }}
             style={styles.input}
             placeholder="Mobile Number"
             placeholderTextColor={Colors.placeholder}
             keyboardType="phone-pad"
+            maxLength={15}
           />
         </View>
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor={Colors.placeholder}
-            secureTextEntry
-          />
+        <Text style={styles.roleLabel}>I am a</Text>
+        <View style={styles.roleRow}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={[
+              styles.roleCard,
+              role === "USER" && styles.selectedRoleCard,
+            ]}
+            onPress={() => setRole("USER")}
+          >
+            <View
+              style={[styles.radio, role === "USER" && styles.selectedRadio]}
+            >
+              {role === "USER" && <Text style={styles.radioDot}>✓</Text>}
+            </View>
+            <Text
+              style={[
+                styles.roleText,
+                role === "USER" && styles.selectedRoleText,
+              ]}
+            >
+              Customer
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={[
+              styles.roleCard,
+              role === "ARTIST" && styles.selectedRoleCard,
+            ]}
+            onPress={() => setRole("ARTIST")}
+          >
+            <View
+              style={[styles.radio, role === "ARTIST" && styles.selectedRadio]}
+            >
+              {role === "ARTIST" && <Text style={styles.radioDot}>✓</Text>}
+            </View>
+            <Text
+              style={[
+                styles.roleText,
+                role === "ARTIST" && styles.selectedRoleText,
+              ]}
+            >
+              Mehendi Artist
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <TouchableOpacity
-          style={styles.loginButton}
-          onPress={() => navigation.navigate("Otp", { phone: mobile })}
+          style={[styles.loginButton, loading && styles.disabledButton]}
+          onPress={handleLogin}
+          disabled={loading}
         >
-          <Text style={styles.loginText}>Login</Text>
+          {loading ? (
+            <ActivityIndicator color={Colors.white} size="small" />
+          ) : (
+            <Text style={styles.loginText}>Send OTP</Text>
+          )}
         </TouchableOpacity>
 
         <Text
@@ -59,42 +147,20 @@ export default function LoginScreen({ navigation }) {
         >
           Don't have an account? Register
         </Text>
-
-        <TouchableOpacity>
-          <Text style={styles.forgot}>Forgot Password?</Text>
-        </TouchableOpacity>
-
-        {/* <Text style={styles.continueText}>or continue with</Text> */}
-
-        {/* <View style={styles.socialRow}>
-          <TouchableOpacity style={styles.socialBtn}>
-            <Text style={styles.socialIcon}>G</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.socialBtn}>
-            <Text style={styles.socialIcon}></Text>
-          </TouchableOpacity>
-        </View> */}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.white,
-  },
+  safeArea: { flex: 1, backgroundColor: Colors.white },
   container: {
     flex: 1,
     backgroundColor: Colors.white,
     paddingHorizontal: 24,
     justifyContent: "center",
   },
-  title: {
-    fontSize: 30,
-    fontWeight: "700",
-    color: Colors.text,
-  },
+  title: { fontSize: 30, fontWeight: "700", color: Colors.text },
   subtitle: {
     fontSize: 14,
     color: Colors.textSecondary,
@@ -109,14 +175,56 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 15,
-    marginBottom: 16,
+    marginBottom: 4,
     backgroundColor: Colors.inputBackground,
   },
-  input: {
-    flex: 1,
-    fontSize: 15,
-    color: Colors.text,
+  input: { flex: 1, fontSize: 15, color: Colors.text },
+  errorText: {
+    color: Colors.error || "#FF3B30",
+    fontSize: 12,
+    marginBottom: 12,
+    marginLeft: 4,
   },
+  roleLabel: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: Colors.text,
+    marginBottom: 12,
+    marginTop: 8,
+  },
+  roleRow: { flexDirection: "row", gap: 12, marginBottom: 24 },
+  roleCard: {
+    flex: 1,
+    height: 56,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    borderRadius: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    backgroundColor: Colors.inputBackground,
+  },
+  selectedRoleCard: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryLight + "20",
+  },
+  radio: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  selectedRadio: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  radioDot: { color: Colors.white, fontWeight: "700", fontSize: 12 },
+  roleText: { fontSize: 14, fontWeight: "500", color: Colors.textSecondary },
+  selectedRoleText: { color: Colors.primary, fontWeight: "700" },
   loginButton: {
     height: 55,
     backgroundColor: Colors.primary,
@@ -125,45 +233,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 8,
   },
-  loginText: {
-    color: Colors.white,
-    fontWeight: "700",
-    fontSize: 16,
-  },
-  forgot: {
-    textAlign: "center",
-    marginTop: 18,
-    color: Colors.textSecondary,
-    fontSize: 14,
-  },
-  continueText: {
-    textAlign: "center",
-    marginTop: 35,
-    color: Colors.textTertiary,
-    fontSize: 14,
-  },
-  socialRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 25,
-    gap: 18,
-  },
-  socialBtn: {
-    width: 65,
-    height: 65,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 18,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  socialIcon: {
-    fontSize: 28,
-  },
+  loginText: { color: Colors.white, fontWeight: "700", fontSize: 16 },
   linkText: {
     marginTop: 16,
     color: Colors.primary,
     textAlign: "center",
     fontWeight: "600",
   },
+  disabledButton: { opacity: 0.7 },
 });

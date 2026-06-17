@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -13,6 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "../../constants/Colors";
 import { verifyUserOtp } from "../../services/auth";
+import { secureStorage } from "../../utils/storage";
 
 export default function OtpScreen({ navigation, route }) {
   const { phone, name, role, otp: initialOtp } = route.params || {};
@@ -20,6 +20,7 @@ export default function OtpScreen({ navigation, route }) {
   const inputRefs = useRef([]);
   const [timer, setTimer] = useState(30);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (timer <= 0) return;
@@ -39,6 +40,7 @@ export default function OtpScreen({ navigation, route }) {
     const newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);
+    setError("");
     if (text && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -58,9 +60,10 @@ export default function OtpScreen({ navigation, route }) {
   };
 
   const handleVerify = async () => {
+    setError("");
     const otpStr = otp.join("");
     if (otpStr.length < 6) {
-      Alert.alert("Validation Error", "Please enter the complete OTP");
+      setError("Please enter the complete OTP");
       return;
     }
 
@@ -74,13 +77,18 @@ export default function OtpScreen({ navigation, route }) {
 
     setLoading(true);
     try {
-      const data = await verifyUserOtp(phone, otpStr);
+      const data = await verifyUserOtp(phone, otpStr, role);
+      const token = await secureStorage.getAccessToken();
+      console.log("Verify OTP Response Token:", token);
+      console.log("Verify OTP Response Data:", JSON.stringify(data, null, 2));
+
       const userRole = data.user?.role || role;
 
       if (userRole === "ARTIST") {
+        await secureStorage.setArtistOnboardingDone(true);
         navigation.reset({
           index: 0,
-          routes: [{ name: "ArtistFlowStack" }],
+          routes: [{ name: "ArtistStack" }],
         });
       } else {
         navigation.reset({
@@ -91,7 +99,7 @@ export default function OtpScreen({ navigation, route }) {
     } catch (error) {
       const message =
         error?.response?.data?.message || error.message || "Invalid OTP. Please try again.";
-      Alert.alert("Verification Failed", message);
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -114,7 +122,7 @@ export default function OtpScreen({ navigation, route }) {
             <TextInput
               key={index}
               ref={(ref) => (inputRefs.current[index] = ref)}
-              style={styles.otpBox}
+              style={[styles.otpBox, error ? styles.otpBoxError : null]}
               maxLength={1}
               value={digit}
               onChangeText={(text) => handleOtpChange(text, index)}
@@ -124,6 +132,7 @@ export default function OtpScreen({ navigation, route }) {
             />
           ))}
         </View>
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <Text style={styles.resend}>
           {timer > 0 ? (
@@ -138,6 +147,7 @@ export default function OtpScreen({ navigation, route }) {
               onPress={() => {
                 setTimer(30);
                 setOtp(["", "", "", "", "", ""]);
+                setError("");
                 inputRefs.current[0]?.focus();
               }}
             >
@@ -170,6 +180,8 @@ const styles = StyleSheet.create({
   mobile: { marginTop: 15, fontSize: 15, fontWeight: "600", color: Colors.text },
   otpContainer: { flexDirection: "row", justifyContent: "space-between", marginTop: 35 },
   otpBox: { width: 50, height: 60, borderWidth: 1, borderColor: Colors.border, borderRadius: 12, textAlign: "center", fontSize: 22, fontWeight: "700", color: Colors.text, backgroundColor: Colors.inputBackground },
+  otpBoxError: { borderColor: Colors.error || "#FF3B30" },
+  errorText: { color: Colors.error || "#FF3B30", fontSize: 12, textAlign: "center", marginTop: 8 },
   resend: { textAlign: "center", marginTop: 30, color: Colors.textTertiary, fontSize: 14 },
   timer: { color: Colors.primary, fontWeight: "700" },
   button: { height: 55, backgroundColor: Colors.primary, borderRadius: 12, justifyContent: "center", alignItems: "center", marginTop: 30 },

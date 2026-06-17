@@ -75,21 +75,45 @@ export async function sendOtp(name, phone, role) {
   return data;
 }
 
-export async function verifyUserOtp(phone, otp) {
+export async function verifyUserOtp(phone, otp, role) {
   const { data } = await apiClient.post(Endpoints.verifyUserOtp, {
     phone,
     otp,
+    role,
   });
-  if (data.token) {
-    secureStorage.setAccessToken(data.token);
+  const payload = data?.data || data;
+  if (payload.token) {
+    await secureStorage.setAccessToken(payload.token);
   }
-  if (data.user) {
-    secureStorage.setUserData(data.user);
+  if (payload.user) {
+    await secureStorage.setUserData(payload.user);
   }
-  if (data.user?.role) {
-    secureStorage.setUserRole(data.user.role);
+  if (payload.user?.role) {
+    await secureStorage.setUserRole(payload.user.role);
   }
-  return data;
+  console.log("Token stored in verifyUserOtp:", payload.token ? "YES" : "NO");
+  return payload;
+}
+
+export async function loginWithPhone(phone, role) {
+  const { data } = await apiClient.post(Endpoints.loginWithPhone, {
+    phone,
+    role,
+  });
+  const payload = data?.data || data;
+  if (payload.token) {
+    secureStorage.setAccessToken(payload.token);
+  }
+  if (payload.accessToken) {
+    secureStorage.setAccessToken(payload.accessToken);
+  }
+  if (payload.user) {
+    secureStorage.setUserData(payload.user);
+  }
+  if (payload.user?.role) {
+    secureStorage.setUserRole(payload.user.role);
+  }
+  return payload;
 }
 
 export async function refreshAccessToken() {

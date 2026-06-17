@@ -1,5 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { useState } from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "../../constants/Colors";
 import CustomButton from "../../components/CustomButton";
@@ -7,9 +9,46 @@ import { useArtistOnboarding } from "../../context/ArtistOnboardingContext";
 
 export default function AadhaarVerificationScreen({ navigation }) {
   const { aadhaarFiles, updateAadhaarFiles } = useArtistOnboarding();
+  const [error, setError] = useState("");
+
+  const pickImage = async (side) => {
+    setError("");
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      setError("Gallery permission is required to upload Aadhaar image");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+      allowsEditing: true,
+      aspect: [4, 3],
+    });
+    if (!result.canceled) {
+      updateAadhaarFiles({ [side]: result.assets[0].uri });
+    }
+  };
+
+  const openCamera = async (side) => {
+    setError("");
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      setError("Camera permission is required to capture Aadhaar image");
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+      allowsEditing: true,
+      aspect: [4, 3],
+    });
+    if (!result.canceled) {
+      updateAadhaarFiles({ [side]: result.assets[0].uri });
+    }
+  };
 
   const handleUpload = (side) => {
-    updateAadhaarFiles({ [side]: side === "front" ? "Aadhaar Front Uploaded" : "Aadhaar Back Uploaded" });
+    pickImage(side);
   };
 
   return (
@@ -22,10 +61,7 @@ export default function AadhaarVerificationScreen({ navigation }) {
           <Text style={styles.label}>Front Side</Text>
           <TouchableOpacity activeOpacity={0.8} style={styles.uploadBox} onPress={() => handleUpload("front")}>
             {aadhaarFiles?.front ? (
-              <View style={styles.successContainer}>
-                <Ionicons name="checkmark-circle" size={40} color={Colors.success} />
-                <Text style={styles.successText}>Front Side Uploaded</Text>
-              </View>
+              <Image source={{ uri: aadhaarFiles.front }} style={styles.uploadedImage} />
             ) : (
               <>
                 <Ionicons name="cloud-upload-outline" size={42} color={Colors.primary} />
@@ -40,10 +76,7 @@ export default function AadhaarVerificationScreen({ navigation }) {
           <Text style={styles.label}>Back Side</Text>
           <TouchableOpacity activeOpacity={0.8} style={styles.uploadBox} onPress={() => handleUpload("back")}>
             {aadhaarFiles?.back ? (
-              <View style={styles.successContainer}>
-                <Ionicons name="checkmark-circle" size={40} color={Colors.success} />
-                <Text style={styles.successText}>Back Side Uploaded</Text>
-              </View>
+              <Image source={{ uri: aadhaarFiles.back }} style={styles.uploadedImage} />
             ) : (
               <>
                 <Ionicons name="cloud-upload-outline" size={42} color={Colors.primary} />
@@ -53,10 +86,12 @@ export default function AadhaarVerificationScreen({ navigation }) {
             )}
           </TouchableOpacity>
         </View>
+
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
       </View>
 
       <View style={styles.footer}>
-        <CustomButton title="Continue" onPress={() => navigation.navigate("PANVerification")} />
+        <CustomButton title="Continue" onPress={() => navigation.navigate("ReviewSubmit")} />
       </View>
     </SafeAreaView>
   );
@@ -69,10 +104,10 @@ const styles = StyleSheet.create({
   subHeading: { fontSize: 14, color: Colors.textSecondary, marginBottom: 25 },
   section: { marginBottom: 20 },
   label: { fontSize: 14, fontWeight: "600", color: Colors.text, marginBottom: 8 },
-  uploadBox: { height: 180, borderWidth: 1.5, borderStyle: "dashed", borderColor: Colors.primary, borderRadius: 16, backgroundColor: Colors.primaryLight + "30", justifyContent: "center", alignItems: "center", paddingHorizontal: 20 },
+  uploadBox: { height: 180, borderWidth: 1.5, borderStyle: "dashed", borderColor: Colors.primary, borderRadius: 16, backgroundColor: Colors.primaryLight + "30", justifyContent: "center", alignItems: "center", paddingHorizontal: 20, overflow: "hidden" },
   uploadTitle: { marginTop: 12, fontSize: 15, fontWeight: "600", color: Colors.text },
   uploadDescription: { marginTop: 5, fontSize: 12, color: Colors.textSecondary, textAlign: "center" },
-  successContainer: { alignItems: "center" },
-  successText: { marginTop: 10, fontSize: 14, fontWeight: "600", color: Colors.success },
+  uploadedImage: { width: "100%", height: "100%", borderRadius: 16 },
+  errorText: { color: Colors.error || "#FF3B30", fontSize: 12, textAlign: "center", marginTop: 8 },
   footer: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 20, backgroundColor: Colors.white },
 });

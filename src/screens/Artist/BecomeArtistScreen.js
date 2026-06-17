@@ -36,7 +36,7 @@ export default function BecomeArtistScreen({ navigation }) {
           <TouchableOpacity
             activeOpacity={0.8}
             style={styles.joinButton}
-            onPress={() => navigation.navigate("KYCVerification")}
+            onPress={() => navigation.navigate("PersonalDetails")}
           >
             <Text style={styles.joinButtonText}>Join Now</Text>
           </TouchableOpacity>

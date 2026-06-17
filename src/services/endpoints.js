@@ -6,6 +6,8 @@ const Endpoints = {
   bookings: "/bookings",
   sendOtp: "/api/v1/mehndigo/user/send-otp",
   verifyUserOtp: "/api/v1/mehndigo/user/verify-otp",
+  loginWithPhone: "/api/v1/mehndigo/user/login",
+  artistProfile: "/api/v1/mehndigo/artist/profile",
 };
 
 export default Endpoints;
